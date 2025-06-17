@@ -6,6 +6,7 @@ namespace PersonalDashboardApp.TaskModule.Models;
 public class TaskItem
 {
     [Display(Name = "Task Id")]
+    [Key]
     public int Id { get; init; }
     
     [Display(Name = "Task Title")]
@@ -14,21 +15,14 @@ public class TaskItem
     public required string Title { get; set; }
     
     [Display(Name = "Task Priority")]
-    public Priority Priority { get; set; }
+    public required Priority Priority { get; set; }
     
     [Display(Name = "Task Deadline")]
-    public DateTime Deadline { get; set; }
+    public required DateTime Deadline { get; set; }
     
     [Display(Name = "Task Status")]
-    public bool IsCompleted { get; private set; }
-
-    public void Complete()
-    {
-        IsCompleted = true;
-    }
-
-    public void Resume()
-    {
-        IsCompleted = false;
-    }
+    public bool IsCompleted { get; set; }
+    
+    [Display(Name = "Status")]
+    public string Status => IsCompleted ? "Completed" : "Active";
 }

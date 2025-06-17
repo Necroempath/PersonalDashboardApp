@@ -1,5 +1,6 @@
 using PersonalDashboardApp.TaskModule.DTOs;
 using PersonalDashboardApp.TaskModule.Models;
+using PersonalDashboardApp.TaskModule.Models.Enums;
 using PersonalDashboardApp.TaskModule.Views;
 
 namespace PersonalDashboardApp.TaskModule.Presenters;
@@ -18,21 +19,41 @@ public class TaskPresenter
         _view.UpdateTaskRequested += OnUpdateTaskRequested;
         _view.DeleteTaskRequested += OnDeleteTaskRequested;
         _view.ToggleCompleteRequested += OnToggleCompleteRequested;
+        
+        _view.SetPriorityOptions(Enum.GetValues(typeof(Priority)).Cast<Priority>());
     }
 
-    private void OnToggleCompleteRequested(int obj)
+    private void OnToggleCompleteRequested(int index)
     {
         throw new NotImplementedException();
     }
 
-    private void OnDeleteTaskRequested(int obj)
+    private void OnDeleteTaskRequested()
     {
-        throw new NotImplementedException();
+        _repository.DeleteTask(_view.SelectedTask.Id);
+        _view.Tasks.Remove(_view.SelectedTask);
+        _view.ClearInput();
     }
 
-    private void OnUpdateTaskRequested(TaskInputDto obj)
+    private void OnUpdateTaskRequested(TaskInputDto task)
     {
-        throw new NotImplementedException();
+        var errors = Validate(task);
+        
+        if (errors.Count != 0)
+        {
+            _view.ShowError(string.Join('\n', errors));
+            return;
+        }
+        
+        TaskItem item = _view.SelectedTask;
+        item.Title = task.Title;
+        item.Deadline = task.Deadline!.Value;
+        item.Priority = task.Priority;
+        
+        _repository.UpdateTask(item);
+        _view.Tasks.Remove(_view.SelectedTask);
+        _view.Tasks.Add(item);
+        _view.ClearInput();
     }
 
     private void OnAddTaskRequested(TaskInputDto task)
@@ -44,9 +65,12 @@ public class TaskPresenter
             _view.ShowError(string.Join('\n', errors));
             return;
         }
+
+        TaskItem item = new TaskItem { Title = task.Title, Deadline = task.Deadline!.Value, Priority = task.Priority };
         
-        _repository.AddTask(task);
-        
+        _repository.AddTask(item);
+        _view.Tasks.Add(item);
+        _view.ClearInput();
     }
 
     private List<string> Validate(TaskInputDto task)
@@ -57,7 +81,11 @@ public class TaskPresenter
             errors.Add("Title cannot be empty");
         }
 
-        if (task.Deadline < DateTime.Now)
+        if (task.Deadline == null)
+        {
+            errors.Add("Deadline cannot be empty");
+        }
+        else if (task.Deadline < DateTime.Now)
         {
             errors.Add("Deadline cannot be less than today");
         }
