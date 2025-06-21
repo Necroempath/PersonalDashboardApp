@@ -4,13 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PersonalDashboardApp"
-        xmlns:views="clr-namespace:PersonalDashboardApp.TaskModule.Views"
+        xmlns:taskView="clr-namespace:PersonalDashboardApp.TaskModule.Views"
+        xmlns:financeView="clr-namespace:PersonalDashboardApp.FinanceModule.Views"
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
-        Title="MainWindow" Height="430" Width="900">
+        Title="MainWindow" Height="450" Width="900">
 
     <Grid>
-        <views:TaskView x:Name="TaskViewControl" Margin="10"/>
+        <TabControl>
+            <TabItem Header="Tasks" Width="200">
+                <taskView:TaskView x:Name="TaskViewControl" Margin="10" />
+            </TabItem>
+            <TabItem Header="Finance" Width="200">
+                <financeView:FinanceView x:Name="FinanceViewControl" Margin="10"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

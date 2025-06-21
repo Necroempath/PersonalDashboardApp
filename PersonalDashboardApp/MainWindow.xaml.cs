@@ -11,6 +11,9 @@ using System.Windows.Shapes;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using PersonalDashboardApp.FinanceModule.Presenters;
+using PersonalDashboardApp.FinanceModule.Repositories;
+using PersonalDashboardApp.FinanceModule.Views;
 using PersonalDashboardApp.TaskModule.Data;
 using PersonalDashboardApp.TaskModule.Models;
 using PersonalDashboardApp.TaskModule.Presenters;
@@ -29,12 +32,10 @@ public partial class MainWindow : Window
         
         var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(connectionString).Options;
         _dbContext = new ApplicationDbContext(options);
-        TaskPresenter presenter = new(TaskViewControl, new SqlTaskRepository(_dbContext));
-        // string query = "CREATE DATABASE [TaskFinanceDb]";
-        // using SqlConnection sqlConnection = new(connectionString);
-        // using SqlCommand sqlCommand = new(query, sqlConnection);
-        // sqlConnection.Open();
-        // sqlCommand.ExecuteNonQuery();
+        
+        TaskPresenter taskPresenter = new(TaskViewControl, new SqlTaskRepository(_dbContext));
+        FinancePresenter financePresenter = new(FinanceViewControl, new InMemoryCategoryRepository());
+        
         _dbContext.Database.EnsureCreated();
         
         var allTasks = _dbContext.Tasks.ToList();

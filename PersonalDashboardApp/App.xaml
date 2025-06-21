@@ -2,8 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PersonalDashboardApp"
+             xmlns:converters="clr-namespace:PersonalDashboardApp.FinanceModule.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+         <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
     </Application.Resources>
 </Application>
