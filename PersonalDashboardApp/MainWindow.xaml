@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
-        Title="MainWindow" Height="450" Width="900">
+        Title="MainWindow" Height="525" Width="950">
 
     <Grid>
         <TabControl>

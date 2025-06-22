@@ -4,16 +4,18 @@ namespace PersonalDashboardApp.FinanceModule.Repositories;
 
 public class InMemoryCategoryRepository : ICategoryRepository
 {
-    public IEnumerable<Category> GetCategories()
+    private static readonly List<string> _categories = new()
     {
-        return new List<Category>
-        {
-            new("Food"),
-            new("Transport"),
-            new("Utilities"),
-            new("Entertainment"),
-            new("Healthcare"),
-            new("Education")
-        };
+        "Food", "Transport", "Utilities", "Entertainment", "Healthcare", "Other"
+    };
+    
+    public IEnumerable<string> GetCategories()
+    {
+        return _categories;
+    }
+
+    public void AddCategory(string category)
+    {
+        _categories.Add(category);
     }
 }

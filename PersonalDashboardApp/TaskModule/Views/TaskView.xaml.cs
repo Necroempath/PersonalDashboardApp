@@ -31,6 +31,14 @@ public partial class TaskView : UserControl, ITaskView
         PriorityComboBox.SelectedIndex = 0;
     }
 
+    public void SetTasks(IEnumerable<TaskItem> tasks)
+    {
+        foreach (var task in tasks)
+        {
+            Tasks.Add(task);
+        }
+    }
+
     public TaskInputDto GetTaskInputDto()
     {
         return new TaskInputDto(TitleTextBox.Text, DeadlinePicker.SelectedDate, (Priority)PriorityComboBox.SelectedItem);

@@ -16,8 +16,8 @@ public interface ITaskView
     void ShowError(string message);
     void ShowInfo(string message);
     public void SetPriorityOptions(IEnumerable<Priority> options);
-    
-    public TaskInputDto GetTaskInputDto();
+    public void SetTasks(IEnumerable<TaskItem> taksk);
+   // public TaskInputDto GetTaskInputDto();
 
     void ClearInput();
     

@@ -1,5 +1,4 @@
 using PersonalDashboardApp.TaskModule.Data;
-using PersonalDashboardApp.TaskModule.DTOs;
 
 namespace PersonalDashboardApp.TaskModule.Models;
 
@@ -25,11 +24,11 @@ public class SqlTaskRepository(ApplicationDbContext dbContext) : ITaskRepository
 
     public IEnumerable<TaskItem> GetAllTasks()
     {
-        throw new NotImplementedException();
+        return dbContext.Tasks.ToList();
     }
 
     public IEnumerable<TaskItem> GetTasksByTitle(string title)
     {
-        throw new NotImplementedException();
+        return dbContext.Tasks.Where(t => t.Title == title);
     }
 }

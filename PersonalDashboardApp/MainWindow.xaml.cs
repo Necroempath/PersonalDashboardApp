@@ -32,16 +32,11 @@ public partial class MainWindow : Window
         
         var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(connectionString).Options;
         _dbContext = new ApplicationDbContext(options);
-        
-        TaskPresenter taskPresenter = new(TaskViewControl, new SqlTaskRepository(_dbContext));
-        FinancePresenter financePresenter = new(FinanceViewControl, new InMemoryCategoryRepository());
-        
         _dbContext.Database.EnsureCreated();
+        TaskPresenter taskPresenter = new(TaskViewControl, new SqlTaskRepository(_dbContext));
+        FinancePresenter financePresenter = new(FinanceViewControl, new SqlFinanceRepository(_dbContext), new InMemoryCategoryRepository());
         
-        var allTasks = _dbContext.Tasks.ToList();
-        foreach (var task in allTasks)
-        {
-            TaskViewControl.Tasks.Add(task);
-        }
+       
+       // _dbContext.Database.Migrate();
     }
 }

@@ -33,13 +33,13 @@
             
             <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="10" VerticalAlignment="Center"  Grid.ColumnSpan="2">
                 <TextBlock Text="Income"  FontSize="16"/>
-                <RadioButton IsChecked="{Binding Type, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Income}" GroupName="TransactionType" Margin="5,5,0,0"/>
+                <RadioButton x:Name="IncomeRadioButton" IsChecked="{Binding Type, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Income}" GroupName="TransactionType" Margin="5,5,0,0"/>
                 <TextBlock Text="Expense"  FontSize="16" Margin="60,0,0,0"/>
-                <RadioButton IsChecked="{Binding Type, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Expense}" GroupName="TransactionType" Margin="5,5,0,0"/>
+                <RadioButton x:Name="ExpenseRadioButton" IsChecked="{Binding Type, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Expense}" GroupName="TransactionType" Margin="5,5,0,0"/>
             </StackPanel>
             
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Category:" FontSize="16" Margin="10"/>
-            <ComboBox SelectedItem="{Binding Category.Name, Mode=TwoWay}" DisplayMemberPath="Name" x:Name="CategoryComboBox" Grid.Row="2" Grid.Column="1" Height="25" Width="200" HorizontalAlignment="Left" FontSize="14"/>
+            <ComboBox SelectedItem="{Binding Category, Mode=TwoWay}" x:Name="CategoryComboBox" Grid.Row="2" Grid.Column="1" Height="25" Width="200" HorizontalAlignment="Left" FontSize="14"/>
             
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Amount:" FontSize="16" Margin="10"/>
             <TextBox Text="{Binding Amount}" x:Name="AmountTextBox" Grid.Row="3" Grid.Column="1" Height="25" Width="200" HorizontalAlignment="Left" FontSize="14"/>
@@ -48,7 +48,7 @@
             <DatePicker SelectedDate="{Binding Date}" x:Name="TransactionTimeDatePicker" Grid.Row="4" Grid.Column="1" Height="25" Width="200" HorizontalAlignment="Left" FontSize="14"/>
             
             <TextBlock Grid.Row="5" Grid.Column="0" Text="Note:" FontSize="16" Margin="10"/>
-            <TextBox Text="{Binding Note}" x:Name="Note" Grid.Row="5" Grid.Column="1" Height="25" Width="200" HorizontalAlignment="Left" FontSize="10"/>
+            <TextBox Text="{Binding Note}" x:Name="NoteTextBox" Grid.Row="5" Grid.Column="1" Height="25" Width="200" HorizontalAlignment="Left" FontSize="13"/>
 
             <Button Grid.Row="6" Grid.Column="0" Content="Add" FontSize="16" VerticalAlignment="Bottom" Width="100" Margin="5" Click="ButtonBase_OnClick"/>
             <Button x:Name="UpdateButton" Grid.Row="7" Grid.Column="0" Content="Update" FontSize="16" Width="100" IsEnabled="False" Margin="5" Click="UpdateButton_OnClick"/>
@@ -59,7 +59,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Finance Records Viewer" FontSize="26" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,10"/>
             
@@ -68,22 +68,24 @@
                 <Button Content="Search" Width="80" Height="20" FontSize="14"/>
             </StackPanel>
 
-            <DataGrid x:Name="FinanceDataGrid"
+            <DataGrid x:Name="DataGridFinanceRecords"
                       Grid.Row="2"
                       SelectionMode="Single"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
-                      IsReadOnly="False"
+                      IsReadOnly="True"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
-                      ItemsSource="{Binding FinanceRecords}">
+                      SelectedItem="{Binding SelectedFinanceRecord, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      SelectionChanged="FinanceRecordsDataGrid_SelectionChanged"
+                      ItemsSource="{Binding FinanceRecords, RelativeSource={RelativeSource AncestorType=UserControl}}">
                     <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="*" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Type" Binding="{Binding Title}" Width="60" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Amount" Binding="{Binding Deadline}" Width="100" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Category" Binding="{Binding Priority}" Width="100" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Transaction date" Binding="{Binding Status}" Width="100" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Note" Binding="{Binding Status}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="*"/>
+                    <DataGridTextColumn Header="Type" Binding="{Binding TransactionType}" Width="60"/>
+                    <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="100"/>
+                    <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="100"/>
+                    <DataGridTextColumn Header="Transaction date" Binding="{Binding TransactionDate}" Width="100"/>
+                    <DataGridTextColumn Header="Note" Binding="{Binding Note}" Width="100"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

@@ -21,6 +21,7 @@ public class TaskPresenter
         _view.ToggleCompleteRequested += OnToggleCompleteRequested;
         
         _view.SetPriorityOptions(Enum.GetValues(typeof(Priority)).Cast<Priority>());
+        _view.SetTasks(_repository.GetAllTasks());
     }
 
     private void OnToggleCompleteRequested(int index)

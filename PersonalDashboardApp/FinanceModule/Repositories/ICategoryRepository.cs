@@ -4,5 +4,7 @@ namespace PersonalDashboardApp.FinanceModule.Repositories;
 
 public interface ICategoryRepository
 {
-    public IEnumerable<Category> GetCategories();
+    public IEnumerable<string> GetCategories();
+    
+    public void AddCategory(string category);
 }
