@@ -8,5 +8,4 @@ public interface ITaskRepository
     void UpdateTask(TaskItem task);
     void DeleteTask(int id);
     IEnumerable<TaskItem> GetAllTasks();
-    IEnumerable<TaskItem> GetTasksByTitle(string title);
 }

@@ -26,9 +26,4 @@ public class SqlTaskRepository(ApplicationDbContext dbContext) : ITaskRepository
     {
         return dbContext.Tasks.ToList();
     }
-
-    public IEnumerable<TaskItem> GetTasksByTitle(string title)
-    {
-        return dbContext.Tasks.Where(t => t.Title == title);
-    }
 }

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using PersonalDashboardApp.TaskModule.DTOs;
 using PersonalDashboardApp.TaskModule.Models;
 using PersonalDashboardApp.TaskModule.Models.Enums;
@@ -14,6 +15,8 @@ public partial class TaskView : UserControl, ITaskView
     public event Action<TaskInputDto>? UpdateTaskRequested;
     public event Action? DeleteTaskRequested;
     public event Action<int>? ToggleCompleteRequested;
+    public event Action<string>? SearchByTitleRequested;
+    public event Action<StatusFilterType>? StatusFilterChanged;
 
     public ObservableCollection<TaskItem> Tasks { get; } = new();
     public TaskItem SelectedTask { get; private set; }
@@ -31,8 +34,16 @@ public partial class TaskView : UserControl, ITaskView
         PriorityComboBox.SelectedIndex = 0;
     }
 
+    public void SetStatusFilterOptions(IEnumerable<StatusFilterType> options)
+    {
+        StatusFilterComboBox.ItemsSource = options;
+        StatusFilterComboBox.SelectedIndex = 0;
+    }
+    
     public void SetTasks(IEnumerable<TaskItem> tasks)
     {
+        Tasks.Clear();
+        
         foreach (var task in tasks)
         {
             Tasks.Add(task);
@@ -85,5 +96,23 @@ public partial class TaskView : UserControl, ITaskView
     private void UpdateButton_Click(object sender, RoutedEventArgs e)
     {
         UpdateTaskRequested?.Invoke(GetTaskInputDto());
+    }
+
+    private void SearchButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        SearchByTitleRequested?.Invoke(FilterTextBox.Text);
+    }
+
+    private void FilterTextBox_OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            SearchByTitleRequested?.Invoke((sender as TextBox).Text);
+        }
+    }
+
+    private void StatusFilterComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        StatusFilterChanged?.Invoke((StatusFilterType)StatusFilterComboBox.SelectedItem);
     }
 }

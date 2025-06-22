@@ -115,18 +115,12 @@
                HorizontalAlignment="Left"
                Margin="0,0,0,10"/>
 
-        <StackPanel Grid.Row="1"
-                    Orientation="Horizontal"
-                    Margin="0,0,0,10">
-            <TextBox Width="300"
-                     
-                     FontSize="14"
-                     VerticalAlignment="Center"
-                     Margin="0,0,10,0"/>
-            <Button Content="Search"
-                    Width="80"
-                    Height="20"
-                    FontSize="14"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+            
+            <TextBox x:Name="FilterTextBox" Width="225" FontSize="14" VerticalAlignment="Center" Margin="0,0,10,0" KeyDown="FilterTextBox_OnKeyDown"/>
+            <Button x:Name="SearchButton" Content="Search" Width="80" Height="20" FontSize="14" Click="SearchButton_OnClick"/>
+            <TextBlock Text="Task status:" Margin="20,0,0,0" FontSize="14"/>
+            <ComboBox x:Name="StatusFilterComboBox" Width="100" Height="20" Margin="10,0,0,0" SelectionChanged="StatusFilterComboBox_OnSelectionChanged"/>
         </StackPanel>
 
         <DataGrid x:Name="TaskDataGrid"
