@@ -1,5 +1,3 @@
-using PersonalDashboardApp.TaskModule.DTOs;
-
 namespace PersonalDashboardApp.TaskModule.Models;
 
 public interface ITaskRepository

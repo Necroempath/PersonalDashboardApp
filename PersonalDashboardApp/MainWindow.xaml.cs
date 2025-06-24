@@ -31,12 +31,11 @@ public partial class MainWindow : Window
         string connectionString = configuration.GetConnectionString("DefaultConnection");
         
         var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(connectionString).Options;
+        
         _dbContext = new ApplicationDbContext(options);
         _dbContext.Database.EnsureCreated();
+        
         TaskPresenter taskPresenter = new(TaskViewControl, new SqlTaskRepository(_dbContext));
         FinancePresenter financePresenter = new(FinanceViewControl, new SqlFinanceRepository(_dbContext), new InMemoryCategoryRepository());
-        
-       
-       // _dbContext.Database.Migrate();
     }
 }

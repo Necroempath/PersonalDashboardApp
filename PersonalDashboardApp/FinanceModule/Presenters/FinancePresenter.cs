@@ -1,6 +1,7 @@
 using System.Windows;
 using PersonalDashboardApp.FinanceModule.Models;
 using PersonalDashboardApp.FinanceModule.Models.DTOs;
+using PersonalDashboardApp.FinanceModule.Models.Enums;
 using PersonalDashboardApp.FinanceModule.Repositories;
 using PersonalDashboardApp.FinanceModule.Views;
 
@@ -20,10 +21,41 @@ public class FinancePresenter
         
         _view.SetRecords(_repository.GetAllRecords());
         _view.SetCategoryTypes(_categoryRepository.GetCategories());
+        _view.SetTransactionTypeFilterOptions(GetTransactionTypeFilterOptions());
         
         _view.AddFinanceRecordRequested += OnAddFinanceRecordRequested;
         _view.DeleteFinanceRecordRequested += OnDeleteFinanceRequested;
         _view.UpdateFinanceRecordRequested += OnUpdateFinanceRequested;
+        _view.SearchRequested += OnSearchRequested;
+        _view.CalculateBalanceRequested += OnCalculateBalanceRequested;
+        _view.TransactionTypeFilterOptionChanged += OnTransactionTypeFilterOptionChanged;
+    }
+
+    private void OnTransactionTypeFilterOptionChanged(TransactionTypeFilter filter)
+    {
+        _view.SetRecords(GetFilteredRecords(filter));
+    }
+
+    private BalanceInfo OnCalculateBalanceRequested()
+    {
+        decimal incomesSum = _repository.GetAllRecords().Where(fr => fr.TransactionType == TransactionType.Income).Sum(fr => fr.Amount);
+        decimal expensesSum = _repository.GetAllRecords().Where(fr => fr.TransactionType == TransactionType.Expense).Sum(fr => fr.Amount);
+        
+        return new BalanceInfo(incomesSum, expensesSum, incomesSum - expensesSum);
+    }
+
+
+    private void OnSearchRequested(string keyword, TransactionTypeFilter filter)
+    {
+        _view.SetRecords(GetFilteredRecords(filter).Where(r => r.Note.ToLower().Contains(keyword.ToLower())));
+        _view.ClearFilterTextBox();
+    }
+
+    private IEnumerable<FinanceRecord> GetFilteredRecords(TransactionTypeFilter filter)
+    {
+        var filteredRecords = _repository.GetAllRecords();
+        
+        return filter.Value is null ? filteredRecords : filteredRecords.Where(fr => fr.TransactionType == filter.Value);        
     }
 
     private void OnDeleteFinanceRequested(int recordId)
@@ -32,13 +64,13 @@ public class FinancePresenter
         _view.FinanceRecords.Remove(_view.SelectedFinanceRecord);
     }
 
-    private void OnUpdateFinanceRequested(FinanceInputDTO input)
+    private void OnUpdateFinanceRequested(FinanceInputDto input)
     {
         var errors = Validate(input);
 
         if (errors.Any())
         {
-            MessageBox.Show($"Errors : {errors}");
+            _view.ShowError(string.Join('\n', errors));
             return;
         }
         
@@ -57,13 +89,13 @@ public class FinancePresenter
         _view.ClearInput();
     }
 
-    private void OnAddFinanceRecordRequested(FinanceInputDTO input)
+    private void OnAddFinanceRecordRequested(FinanceInputDto input)
     {
         var errors = Validate(input);
 
         if (errors.Any())
         {
-            MessageBox.Show("There were errors while adding finance record");
+            _view.ShowError(string.Join('\n', errors));
             return;
         }
         
@@ -75,13 +107,13 @@ public class FinancePresenter
         _view.ClearInput();
     }
 
-    private List<string> Validate(FinanceInputDTO input)
+    private List<string> Validate(FinanceInputDto input)
     {
         List<string> errors = new();
 
         if (!decimal.TryParse(input.Amount, out decimal amount))
         {
-            errors.Add("Amount must be a float");
+            errors.Add("Amount must be positive number");
         }
         else if (amount < 0)
         {
@@ -92,11 +124,21 @@ public class FinancePresenter
         {
             errors.Add("Transaction date can not be empty");
         }
-        else if (input.Date < DateTime.Now)
+        else if (input.Date > DateTime.Now)
         {
-            errors.Add("Transaction date can not be less than today");
+            errors.Add("Transaction date can not be set in future");
         }
         
         return errors;
+    }
+
+    public IEnumerable<TransactionTypeFilter> GetTransactionTypeFilterOptions()
+    {
+        yield return new ("All", null);
+
+        foreach (TransactionType type in Enum.GetValues(typeof(TransactionType)))
+        {
+            yield return new(type.ToString(), type);
+        }
     }
 }

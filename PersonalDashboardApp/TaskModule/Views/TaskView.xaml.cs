@@ -5,19 +5,16 @@ using System.Windows.Input;
 using PersonalDashboardApp.TaskModule.DTOs;
 using PersonalDashboardApp.TaskModule.Models;
 using PersonalDashboardApp.TaskModule.Models.Enums;
-using PersonalDashboardApp.TaskModule.Presenters;
 
 namespace PersonalDashboardApp.TaskModule.Views;
 
-public partial class TaskView : UserControl, ITaskView
+public partial class TaskView : ITaskView
 {
     public event Action<TaskInputDto>? AddTaskRequested;
     public event Action<TaskInputDto>? UpdateTaskRequested;
     public event Action? DeleteTaskRequested;
-    public event Action<int>? ToggleCompleteRequested;
-    public event Action<string>? SearchByTitleRequested;
-    public event Action<StatusFilterType>? StatusFilterChanged;
-
+    public event Action<string, bool?>? SearchRequested;
+    public event Action<bool?>? StatusFilterChanged;
     public ObservableCollection<TaskItem> Tasks { get; } = new();
     public TaskItem SelectedTask { get; private set; }
     
@@ -34,7 +31,7 @@ public partial class TaskView : UserControl, ITaskView
         PriorityComboBox.SelectedIndex = 0;
     }
 
-    public void SetStatusFilterOptions(IEnumerable<StatusFilterType> options)
+    public void SetStatusFilterOptions(IEnumerable<StatusFilter> options)
     {
         StatusFilterComboBox.ItemsSource = options;
         StatusFilterComboBox.SelectedIndex = 0;
@@ -63,11 +60,6 @@ public partial class TaskView : UserControl, ITaskView
     public void ShowError(string message)
     {
         MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-    }
-
-    public void ShowInfo(string message)
-    {
-        MessageBox.Show(message, "Info", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -100,19 +92,24 @@ public partial class TaskView : UserControl, ITaskView
 
     private void SearchButton_OnClick(object sender, RoutedEventArgs e)
     {
-        SearchByTitleRequested?.Invoke(FilterTextBox.Text);
+        SearchRequested?.Invoke(FilterTextBox.Text, (StatusFilterComboBox.SelectedItem as StatusFilter).Value);
     }
 
     private void FilterTextBox_OnKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
         {
-            SearchByTitleRequested?.Invoke((sender as TextBox).Text);
+            SearchRequested?.Invoke(FilterTextBox.Text, (StatusFilterComboBox.SelectedItem as StatusFilter).Value);
         }
+    }
+
+    public void ClearSearchTextBox()
+    {
+        FilterTextBox.Clear();
     }
 
     private void StatusFilterComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        StatusFilterChanged?.Invoke((StatusFilterType)StatusFilterComboBox.SelectedItem);
+        StatusFilterChanged?.Invoke((StatusFilterComboBox.SelectedItem as StatusFilter).Value);
     }
 }

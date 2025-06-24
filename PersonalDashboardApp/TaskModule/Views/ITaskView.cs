@@ -10,20 +10,17 @@ public interface ITaskView
     event Action<TaskInputDto> AddTaskRequested;
     event Action<TaskInputDto> UpdateTaskRequested;
     event Action DeleteTaskRequested;
-    event Action<int> ToggleCompleteRequested;
-    event Action<string> SearchByTitleRequested;
-    event Action<StatusFilterType> StatusFilterChanged;
+    event Action<string, bool?> SearchRequested;
+    event Action<bool?> StatusFilterChanged;
     
-   // void SetTasksList(IEnumerable<TaskItem> tasks);
-    void ShowError(string message);
-    void ShowInfo(string message);
     public void SetPriorityOptions(IEnumerable<Priority> options);
-    public void SetStatusFilterOptions(IEnumerable<StatusFilterType> options);
-    public void SetTasks(IEnumerable<TaskItem> taksk);
-   // public TaskInputDto GetTaskInputDto();
+    public void SetStatusFilterOptions(IEnumerable<StatusFilter> options);
+    public void SetTasks(IEnumerable<TaskItem> tasks);
 
+    void ShowError(string message);
     void ClearInput();
-    
+    void ClearSearchTextBox();
+
     public ObservableCollection<TaskItem> Tasks { get; }
     
     public TaskItem SelectedTask { get; }

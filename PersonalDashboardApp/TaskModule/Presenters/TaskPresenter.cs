@@ -9,55 +9,41 @@ public class TaskPresenter
 {
     private readonly ITaskView _view;
     private readonly ITaskRepository _repository;
-    private readonly IEnumerable<TaskItem> _allTasks;
-    private List<TaskItem> _filteredByStatusTasks;
 
     public TaskPresenter(ITaskView view, ITaskRepository repository)
     {
         _view = view;
         _repository = repository;
-        _allTasks = _repository.GetAllTasks();
-        _filteredByStatusTasks = _repository.GetAllTasks().ToList();
 
         _view.AddTaskRequested += OnAddTaskRequested;
         _view.UpdateTaskRequested += OnUpdateTaskRequested;
         _view.DeleteTaskRequested += OnDeleteTaskRequested;
-        _view.ToggleCompleteRequested += OnToggleCompleteRequested;
-        _view.SearchByTitleRequested += OnSearchByTitleTitleRequested;
+        _view.SearchRequested += OnSearchRequested;
         _view.StatusFilterChanged += OnStatusFilterChanged;
 
         _view.SetPriorityOptions(Enum.GetValues(typeof(Priority)).Cast<Priority>());
-        _view.SetStatusFilterOptions(Enum.GetValues(typeof(StatusFilterType)).Cast<StatusFilterType>());
+        _view.SetStatusFilterOptions(GetStatusTypeFilterOptions());
 
-        _view.SetTasks(_filteredByStatusTasks);
+        _view.SetTasks(_repository.GetAllTasks());
     }
 
-    public void OnStatusFilterChanged(StatusFilterType filterType)
+
+    private void OnStatusFilterChanged(bool? isCompleted)
     {
-        switch (filterType)
-        {
-            case StatusFilterType.All:
-                _filteredByStatusTasks = _allTasks.ToList();
-                break;
-            case StatusFilterType.Completed:
-                _filteredByStatusTasks = _allTasks.Where(t => t.IsCompleted).ToList();
-                break;
-            case StatusFilterType.Active:
-                _filteredByStatusTasks = _allTasks.Where(t => !t.IsCompleted).ToList();
-                break;
-        }
-        
-        _view.SetTasks(_filteredByStatusTasks);
+        _view.SetTasks(GetFilteredTasks(isCompleted));
     }
 
-    private void OnSearchByTitleTitleRequested(string keyword)
+    private void OnSearchRequested(string keyword, bool? isCompleted)
     {
-        _view.SetTasks(_filteredByStatusTasks.Where(t => t.Title.ToLower().Contains(keyword.ToLower())));
+        _view.SetTasks(GetFilteredTasks(isCompleted).Where(t => t.Title.ToLower().Contains(keyword.ToLower())));
+        _view.ClearSearchTextBox();
     }
 
-    private void OnToggleCompleteRequested(int index)
+    private IEnumerable<TaskItem> GetFilteredTasks(bool? isCompleted)
     {
-        throw new NotImplementedException();
+        var filteredTasks = _repository.GetAllTasks();
+
+        return isCompleted is null ? filteredTasks : filteredTasks.Where(t => t.IsCompleted == isCompleted);
     }
 
     private void OnDeleteTaskRequested()
@@ -78,11 +64,13 @@ public class TaskPresenter
         }
 
         TaskItem item = _view.SelectedTask;
+        
         item.Title = task.Title;
         item.Deadline = task.Deadline!.Value;
         item.Priority = task.Priority;
 
         _repository.UpdateTask(item);
+        
         _view.Tasks.Remove(_view.SelectedTask);
         _view.Tasks.Add(item);
         _view.ClearInput();
@@ -123,5 +111,14 @@ public class TaskPresenter
         }
 
         return errors;
+    }
+    private IEnumerable<StatusFilter> GetStatusTypeFilterOptions()
+    {
+        return new List<StatusFilter>()
+        {
+            new("All", null),
+            new("Completed", true),
+            new("Active", false),
+        };
     }
 }
